@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<!-- v1.1 fix init render -->
 <title>中国象棋 - 对战小miu</title>
 <style>
   * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
@@ -57,8 +56,6 @@
 <div id="toast"></div>
 <div id="overlay"><div id="ov-card"><div id="ov-text"></div><button id="btn-again">再来一局</button></div></div>
 <script>
-window.onerror=function(m,s,l){var e=document.getElementById('status');if(e)e.textContent='JS错:'+m+' 行'+l;};
-window.__errs=[];window.addEventListener('error',function(e){window.__errs.push(e.message);});
 /*__CORE_BEGIN__*/
 var D4=[[1,0],[-1,0],[0,1],[0,-1]];
 var DD=[[1,1],[1,-1],[-1,1],[-1,-1]];
@@ -272,7 +269,7 @@ function notation(b,m,side){
 }
 /*__CORE_END__*/
 /* ---- UI ---- */
-var board,turn,selected,selMoves,history,gameOver,aiThinking,lastMove;
+var board,turn,selected,selMoves,moveHist,gameOver,aiThinking,lastMove;
 var cv=document.getElementById('cv'),ctx=cv.getContext('2d');
 var W,H,cell,MG;
 function resize(){
@@ -373,10 +370,10 @@ function toast(msg){
 function setStatus(html){document.getElementById('status').innerHTML=html;}
 function renderHistory(){
   var h=document.getElementById('hist');
-  if(!history.length){h.textContent='—';return;}
+  if(!moveHist.length){h.textContent='—';return;}
   var s='';
-  for(var i=0;i<history.length;i+=2){
-    var n=(i/2+1),r1=history[i],r2=history[i+1];
+  for(var i=0;i<moveHist.length;i+=2){
+    var n=(i/2+1),r1=moveHist[i],r2=moveHist[i+1];
     s+='<div>'+n+'. <span class="mv-r">'+r1.note+'</span>';
     if(r2)s+='　<span class="mv-b">'+r2.note+'</span>';
     s+='</div>';
@@ -385,7 +382,7 @@ function renderHistory(){
   h.parentElement.scrollTop=h.parentElement.scrollHeight;
 }
 function newGame(){
-  board=newBoard();turn='r';selected=null;selMoves=[];history=[];
+  board=newBoard();turn='r';selected=null;selMoves=[];moveHist=[];
   gameOver=false;aiThinking=false;lastMove=null;
   document.getElementById('overlay').classList.remove('show');
   setStatus('轮到你走棋');
@@ -412,7 +409,7 @@ function tap(x,y){
 function commitMove(side,m){
   var note=notation(board,m,side);
   doMove(board,m);
-  history.push({fx:m.fx,fy:m.fy,tx:m.tx,ty:m.ty,cap:m.cap,note:note,side:side});
+  moveHist.push({fx:m.fx,fy:m.fy,tx:m.tx,ty:m.ty,cap:m.cap,note:note,side:side});
   lastMove={fx:m.fx,fy:m.fy,tx:m.tx,ty:m.ty};
   selected=null;selMoves=[];
   turn=side==='r'?'b':'r';
@@ -453,9 +450,9 @@ function playerMove(m){
   afterMove();
 }
 function undo(){
-  if(aiThinking||!history.length)return;
+  if(aiThinking||!moveHist.length)return;
   var n=0;
-  while(history.length&&n<2){var m=history.pop();undoMove(board,m);n++;}
+  while(moveHist.length&&n<2){var m=moveHist.pop();undoMove(board,m);n++;}
   turn='r';selected=null;selMoves=[];lastMove=null;gameOver=false;
   document.getElementById('overlay').classList.remove('show');
   setStatus('轮到你走棋');renderHistory();draw();
