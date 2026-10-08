@@ -297,6 +297,7 @@ function drawStar(x,y){
   }
 }
 function draw(){
+    if (typeof board === 'undefined' || !board) return;
   ctx.clearRect(0,0,W,H);
   ctx.fillStyle='#e9c88f';ctx.fillRect(0,0,W,H);
   ctx.strokeStyle='#5a3a1a';ctx.lineWidth=2;
