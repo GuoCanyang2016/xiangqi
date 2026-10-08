@@ -20,6 +20,9 @@
   #controls button { flex:1; padding:11px 0; font-size:16px; font-weight:bold; border:none; border-radius:8px;
     background:#4a4a58; color:#fff; cursor:pointer; }
   #controls button:active { background:#5c5c6c; }
+  #diff-wrap { margin-left:8px; font-size:13px; color:#bbb; }
+  #diff-wrap .diff { padding:6px 10px; margin-left:4px; font-size:13px; }
+  #diff-wrap .diff.on { background:#b73a2b; color:#fff; }
   #hist-wrap { background:#3a3a46; border-radius:8px; padding:8px 10px; max-height:130px; overflow-y:auto; }
   #hist-wrap h4 { font-size:13px; color:#aaa; margin-bottom:6px; }
   #hist { font-size:14px; line-height:1.9; color:#ddd; }
@@ -50,6 +53,7 @@
   <div id="controls">
     <button id="btn-undo">悔棋</button>
     <button id="btn-new">新对局</button>
+    <span id="diff-wrap">难度:<button class="diff" data-d="2">新手</button><button class="diff on" data-d="3">普通</button><button class="diff" data-d="4">大师</button></span>
   </div>
   <div id="hist-wrap"><h4>棋谱</h4><div id="hist">—</div></div>
 </div>
@@ -270,6 +274,7 @@ function notation(b,m,side){
 /*__CORE_END__*/
 /* ---- UI ---- */
 var board,turn,selected,selMoves,moveHist,gameOver,aiThinking,lastMove;
+var aiDepth=3; /* 2=新手 3=普通 4=大师 */
 var cv=document.getElementById('cv'),ctx=cv.getContext('2d');
 var W,H,cell,MG;
 function resize(){
@@ -434,7 +439,7 @@ function afterMove(){
     setStatus('<span class="think">小miu 思考中…</span>');
     aiThinking=true;draw();
     setTimeout(function(){
-      var m=aiBestMove(board,3);
+      var m=aiBestMove(board,aiDepth);
       aiThinking=false;
       if(!m){gameOver=true;return;}
       commitMove('b',m);
@@ -474,6 +479,13 @@ document.getElementById('btn-again').addEventListener('click',function(){
   document.getElementById('overlay').classList.remove('show');newGame();});
 window.addEventListener('resize',resize);
 window.addEventListener('orientationchange',function(){setTimeout(resize,200);});
+document.querySelectorAll('#diff-wrap .diff').forEach(function(b){
+  b.addEventListener('click',function(){
+    document.querySelectorAll('#diff-wrap .diff').forEach(function(x){x.classList.remove('on');});
+    b.classList.add('on');aiDepth=parseInt(b.dataset.d,10);
+    toast(['新手','普通','大师'][aiDepth-2]+'难度');
+  });
+});
 resize();newGame();
 </script>
 </body>
