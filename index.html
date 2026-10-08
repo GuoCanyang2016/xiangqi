@@ -57,6 +57,8 @@
 <div id="toast"></div>
 <div id="overlay"><div id="ov-card"><div id="ov-text"></div><button id="btn-again">再来一局</button></div></div>
 <script>
+window.onerror=function(m,s,l){var e=document.getElementById('status');if(e)e.textContent='JS错:'+m+' 行'+l;};
+window.__errs=[];window.addEventListener('error',function(e){window.__errs.push(e.message);});
 /*__CORE_BEGIN__*/
 var D4=[[1,0],[-1,0],[0,1],[0,-1]];
 var DD=[[1,1],[1,-1],[-1,1],[-1,-1]];
